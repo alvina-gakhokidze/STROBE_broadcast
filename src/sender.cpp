@@ -8,25 +8,23 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
-// REPLACE WITH YOUR ESP RECEIVER'S MAC ADDRESS
-
 #define MAC_ADDRESS_SIZE 6
-#define NUM_ADDRESSES 16
 #define NUM_BOOLS 5
 #define NUM_FLOATS 4
 
-// uint8_t broadcastAddress1[] = {0x98, 0x3d, 0xae, 0x64, 0xc9, 0x60};
-//uint8_t broadcastAddress1[] = {0x98, 0x3d, 0xae, 0x64, 0xc9, 0xa8};
-uint8_t broadcastAddress1[] = {0x28, 0x37, 0x2f, 0xe0, 0x95, 0xf8}; //done
-uint8_t broadcastAddress2[] = {0x28, 0x37, 0x2f, 0xe0, 0xaa, 0x1c}; //done
-uint8_t broadcastAddress3[] = {0x28, 0x37, 0x2f, 0xe0, 0x96, 0x20}; //done
-uint8_t broadcastAddress4[] = {0x28, 0x37, 0x2f, 0xe0, 0xaa, 0x6c}; //done
-//uint8_t broadcastAddress6[] = {0x28, 0x37, 0x2f, 0xe0, 0xa9, 0xdc};
+
+/********************* START OF USER ADJUSTABLE CODE*********************************/
+
+#define NUM_ADDRESSES 16 // NUMBER OF STROBES YOU ARE BROADCASTING TO - CHANGE IF NEEDED
+
+
+// you can declare up to 20 addresses total. MAC address will be printed in form  XX:XX:XX:XX:XX:XX -> convert into: {0xXX, 0xXX, 0xXX, 0xXX, 0xXX, 0xXX } ; 
+uint8_t broadcastAddress1[] = {0x28, 0x37, 0x2f, 0xe0, 0x95, 0xf8}; 
+uint8_t broadcastAddress2[] = {0x28, 0x37, 0x2f, 0xe0, 0xaa, 0x1c}; 
+uint8_t broadcastAddress3[] = {0x28, 0x37, 0x2f, 0xe0, 0x96, 0x20}; 
+uint8_t broadcastAddress4[] = {0x28, 0x37, 0x2f, 0xe0, 0xaa, 0x6c}; 
 uint8_t broadcastAddress5[] = {0x28, 0x37, 0x2f, 0xe0, 0xaa, 0x0c};
 uint8_t broadcastAddress6[] = {0x28, 0x37, 0x2f, 0xe0, 0xaa, 0x60};
-//uint8_t broadcastAddress9[] = {0x28, 0x37, 0x2f, 0xe0, 0x95, 0xfc};
-//uint8_t broadcastAddress10[] = {0x28, 0x37, 0x2f, 0xe0, 0xa9, 0xcc};
-//uint8_t broadcastAddress11[] = {0x28, 0x37, 0x2f, 0xe0, 0x96, 0x00};
 uint8_t broadcastAddress7[] = {0x28, 0x37, 0x2f, 0xe0, 0x95, 0xd0};
 uint8_t broadcastAddress8[] = {0x98, 0x3d, 0xae, 0x64, 0xc9, 0x88};
 uint8_t broadcastAddress9[] = {0x28, 0x37, 0x2f, 0xe0, 0x96, 0x44};
@@ -35,38 +33,25 @@ uint8_t broadcastAddress11[] = {0x28, 0x37, 0x2f, 0xe0, 0xaa, 0x24};
 uint8_t broadcastAddress12[] = {0x28, 0x37, 0x2f, 0xe0, 0xaa, 0x20};
 uint8_t broadcastAddress13[] = {0x98, 0x3d, 0xae, 0x64, 0xc9, 0xa0};
 uint8_t broadcastAddress14[] = {0x28, 0x37, 0x2f, 0xe0, 0x96, 0x18};
-//uint8_t broadcastAddress15[] = {0x98, 0x3d, 0xae, 0x64, 0xc9, 0xa4};
-uint8_t broadcastAddress15[] = {0x98, 0x3d, 0xae, 0x64, 0xc9, 0x64}; // INCLUDE THIS ONE
-// //uint8_t broadcastAddress17[] = {0x28, 0x37, 0x2f, 0xe0, 0xa9, 0xe0};
-// uint8_t broadcastAddress16[] = {0x28, 0x37, 0x2f, 0xe0, 0x96, 0x04};//
-uint8_t broadcastAddress16[] = {0x28, 0x37, 0x2f, 0xe0, 0xa9, 0xe0};//
+uint8_t broadcastAddress15[] = {0x98, 0x3d, 0xae, 0x64, 0xc9, 0x64};
+uint8_t broadcastAddress16[] = {0x28, 0x37, 0x2f, 0xe0, 0xa9, 0xe0};
 
-//uint8_t broadcastAddress20[] = {0x28, 0x37, 0x2f, 0xe0, 0x96, 0x0c};
 
 uint8_t* broadcastList[] = {broadcastAddress1, broadcastAddress2, broadcastAddress3, 
     broadcastAddress4, broadcastAddress5, 
     broadcastAddress6, broadcastAddress7, broadcastAddress8,
     broadcastAddress9, broadcastAddress10,
     broadcastAddress11, broadcastAddress12, broadcastAddress13,
-    broadcastAddress14, broadcastAddress15, broadcastAddress16};
+    broadcastAddress14, broadcastAddress15, broadcastAddress16}; // if there are more address, add them to this list
 
 
-// uint8_t broadcastAddress2[] = {0xFF, , , , , };
-// uint8_t broadcastAddress3[] = {0xFF, , , , , };
-
-
+/********************* END OF USER ADJUSTABLE CODE*********************************/
 
 const byte numChars = 64;
 char receivedChars[numChars];
-char tempChars[numChars];        // temporary array for use when parsing
-
-      // variables to hold the parsed data
-
+char tempChars[numChars];
 int conditionInputs[NUM_BOOLS];
-
 float parameterInputs[NUM_FLOATS];
-
-
 boolean newData = false;
 
 
@@ -86,7 +71,7 @@ wifiParams outData;
 
 esp_now_peer_info_t peerInfo;
 
-// callback when data is sent
+
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   char macStr[18];
   Serial.print("Packet to: ");
@@ -120,21 +105,6 @@ bool addPeer(esp_now_peer_info_t * peerData, uint8_t broadcastAddress[], int num
     return true;
 }
 
-
- /**
- * @brief read Serial input from user, keep asking until valid option chosen
- */
-int getUserInput()
-{
-    int userInput = 0;
-    
-        while (Serial.available() == 0);
-
-        userInput = Serial.parseInt();
-        
-        
-    
-}
 
 void recvWithStartEndMarkers() {
     static boolean recvInProgress = false;
